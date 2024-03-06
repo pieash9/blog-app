@@ -18,7 +18,6 @@
   - createdAt
   - updatedAt
   - published
-  - publishedAt
 
 - user
 
@@ -37,3 +36,10 @@
   - createdAt
   - updatedAt
   - userId
+
+## Technology stack
+
+- graphql
+- typescript
+- postgresql
+- prisma
