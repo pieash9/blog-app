@@ -2,14 +2,24 @@ export const typeDefs = `#graphql
 
     type Query {
         me: User
+        users:[User]
         posts:[Post]
     }
 
     type Mutation {
-        singup(name:String!,
+        singup(
+            name:String!,
             email: String!,
             password: String!
-        ):User
+            bio: String
+        ):AuthPayload,
+
+        signin(email:String!,password:String!):AuthPayload
+    }
+
+    type AuthPayload {
+        userError:String
+        token:String
     }
 
     type Post {

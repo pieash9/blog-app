@@ -1,14 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Query } from "./Query/Query";
+import { Mutation } from "./Mutation/Mutation";
 
 export const resolvers = {
-  Query: {},
-  Mutation: {
-    singup: async (parent: any, args: any, context: any) => {
-      return await prisma.user.create({
-        data: args,
-      });
-    },
-  },
+  Query,
+  Mutation,
 };
