@@ -1,8 +1,5 @@
 import bcrypt from "bcrypt";
 import { jwtHelper } from "../../utils/jwtHelper";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 interface UserInfo {
   name: string;
@@ -12,7 +9,7 @@ interface UserInfo {
 }
 
 export const Mutation = {
-  singup: async (parent: any, args: UserInfo, context: any) => {
+  singup: async (parent: any, args: UserInfo, { prisma }: any) => {
     const isExist = await prisma.user.findFirst({
       where: {
         email: args.email,
@@ -42,11 +39,11 @@ export const Mutation = {
       });
     }
 
-    const token = await jwtHelper({ userId: newUser.id });
+    const token = await jwtHelper.generateToken({ userId: newUser.id });
     return { userError: null, token };
   },
 
-  signin: async (parent: any, args: any, context: any) => {
+  signin: async (parent: any, args: any, { prisma }: any) => {
     const user = await prisma.user.findFirst({
       where: {
         email: args.email,
@@ -69,10 +66,39 @@ export const Mutation = {
       };
     }
 
-    const token = await jwtHelper({ userId: user.id });
+    const token = await jwtHelper.generateToken({ userId: user.id });
     return {
       userError: null,
       token,
+    };
+  },
+
+  addPost: async (parent: any, args: any, { prisma, userInfo }: any) => {
+    if (!userInfo) {
+      return {
+        userError: "Unauthorized",
+        post: null,
+      };
+    }
+
+    if (!args.title || !args.content) {
+      return {
+        userError: "Title and content required.",
+        post: null,
+      };
+    }
+
+    const newPost = await prisma.post.create({
+      data: {
+        title: args.title,
+        content: args.content,
+        authorId: userInfo.userId,
+      },
+    });
+
+    return {
+      userError: null,
+      post: newPost,
     };
   },
 };
