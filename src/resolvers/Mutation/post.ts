@@ -56,6 +56,7 @@ export const postResolvers = {
       post: updatedPost,
     };
   },
+
   deletePost: async (parent: any, args: any, { prisma, userInfo }: any) => {
     if (!userInfo) {
       return {
@@ -79,6 +80,33 @@ export const postResolvers = {
     return {
       userError: null,
       post: deletePost,
+    };
+  },
+
+  publishPost: async (parent: any, args: any, { prisma, userInfo }: any) => {
+    if (!userInfo) {
+      return {
+        userError: "Unauthorized",
+        post: null,
+      };
+    }
+
+    const error = await checkUserAccess(prisma, userInfo.userId, args.postId);
+
+    if (error) {
+      return error;
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: {
+        id: Number(args.postId),
+      },
+      data: { published: true },
+    });
+
+    return {
+      userError: null,
+      post: updatedPost,
     };
   },
 };
